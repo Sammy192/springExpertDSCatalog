@@ -30,4 +30,12 @@ public class CategoryResource {
         CategoryDTO list = service.findById(id);
         return ResponseEntity.ok().body(list);
     }
+
+    @PostMapping
+    public ResponseEntity<CategoryDTO> insert(@RequestBody CategoryDTO dto) {
+        dto = service.insert(dto);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(dto.getId()).toUri();
+        return ResponseEntity.ok().body(dto);
+    }
 }
