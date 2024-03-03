@@ -2,6 +2,7 @@ package com.devsamuca.dscatalog.resources;
 
 import com.devsamuca.dscatalog.dto.ProductDTO;
 import com.devsamuca.dscatalog.tests.Factory;
+import com.devsamuca.dscatalog.tests.TokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,9 +27,14 @@ public class ProductResourceIT {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private TokenUtil tokenUtil;
+
     private Long existingId;
     private Long nonExistingId;
     private Long countTotalProducts;
+
+    private String username, password, bearerToken;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -38,6 +44,11 @@ public class ProductResourceIT {
         existingId = 1L;
         nonExistingId = 1000L;
         countTotalProducts = 25L;
+
+        username = "maria@gmail.com";
+        password = "123456";
+
+        bearerToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
     }
 
     @Test
@@ -63,9 +74,10 @@ public class ProductResourceIT {
         String expectedDescription = productDTO.getDescription();
 
         ResultActions result = mockMvc.perform(put("/products/{id}", existingId)
-                .content(jsonBody)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON));
+                        .header("Authorization", "Bearer " + bearerToken)
+                        .content(jsonBody)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.id").value(existingId));
@@ -81,6 +93,7 @@ public class ProductResourceIT {
         String jsonBody = objectMapper.writeValueAsString(productDTO);
 
         ResultActions result = mockMvc.perform(put("/products/{id}", nonExistingId)
+                .header("Authorization", "Bearer " + bearerToken)
                 .content(jsonBody)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
