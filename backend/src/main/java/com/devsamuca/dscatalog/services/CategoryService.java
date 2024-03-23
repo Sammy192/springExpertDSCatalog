@@ -25,9 +25,9 @@ public class CategoryService {
     private CategoryRepository repository;
 
     @Transactional(readOnly = true)
-    public Page<CategoryDTO> findAll(Pageable pageable) {
-        Page<Category> list = repository.findAll(pageable);
-        Page<CategoryDTO> listDTO = list.map(x -> new CategoryDTO(x));
+    public List<CategoryDTO> findAll() {
+        List<Category> list = repository.findAll();
+        List<CategoryDTO> listDTO = list.stream().map(x -> new CategoryDTO(x)).toList();
         return listDTO;
 
         //forma de converter entity Category para CategoryDTO
