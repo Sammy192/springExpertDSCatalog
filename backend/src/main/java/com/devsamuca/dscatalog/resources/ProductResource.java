@@ -1,6 +1,7 @@
 package com.devsamuca.dscatalog.resources;
 
 import com.devsamuca.dscatalog.dto.ProductDTO;
+import com.devsamuca.dscatalog.projections.ProductProjection;
 import com.devsamuca.dscatalog.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,11 @@ public class ProductResource {
     private ProductService service;
 
     @GetMapping
-    public ResponseEntity<Page<ProductDTO>> findAll(Pageable pageable) {
-        Page<ProductDTO> list = service.findAll(pageable);
+    public ResponseEntity<Page<ProductProjection>> findAll(
+            @RequestParam(value = "name", defaultValue = "") String name,
+            @RequestParam(value = "categoryId", defaultValue = "0") String categoryId,
+            Pageable pageable) {
+        Page<ProductProjection> list = service.findAllPaged(name, categoryId, pageable);
         return ResponseEntity.ok().body(list);
     }
 

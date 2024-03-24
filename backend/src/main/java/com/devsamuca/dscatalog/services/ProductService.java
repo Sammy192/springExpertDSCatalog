@@ -4,6 +4,7 @@ import com.devsamuca.dscatalog.dto.CategoryDTO;
 import com.devsamuca.dscatalog.dto.ProductDTO;
 import com.devsamuca.dscatalog.entities.Category;
 import com.devsamuca.dscatalog.entities.Product;
+import com.devsamuca.dscatalog.projections.ProductProjection;
 import com.devsamuca.dscatalog.repositories.CategoryRepository;
 import com.devsamuca.dscatalog.repositories.ProductRepository;
 import com.devsamuca.dscatalog.services.exceptions.DatabaseException;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -97,5 +100,20 @@ public class ProductService {
             entity.getCategories().add(category);
         }
 
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductProjection> findAllPaged(String name, String categoryId, Pageable pageable) {
+
+        List<Long> categoryIds = Arrays.asList();
+        if (!"0".equals(categoryId)) {
+            String[] vet = categoryId.split(",");
+            List<String> list = Arrays.asList(vet);
+            categoryIds = list.stream().map(x -> Long.parseLong(x)).toList();
+
+            //categoryIds = Arrays.asList(categoryId.split(",")).stream().map(Long::parseLong).toList();
+        }
+
+        return repository.searchProducts(categoryIds, name, pageable);
     }
 }
