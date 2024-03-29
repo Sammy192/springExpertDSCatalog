@@ -1,6 +1,7 @@
 package com.devsamuca.dscatalog.services;
 
 import com.devsamuca.dscatalog.dto.EmailDTO;
+import com.devsamuca.dscatalog.dto.NewPasswordDTO;
 import com.devsamuca.dscatalog.entities.PasswordRecover;
 import com.devsamuca.dscatalog.entities.User;
 import com.devsamuca.dscatalog.repositories.PasswordRecoverRepository;
@@ -8,14 +9,19 @@ import com.devsamuca.dscatalog.repositories.UserRepository;
 import com.devsamuca.dscatalog.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class AuthService {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Value("${email.password-recover.token.minutes}")
     private Long tokenMinutes;
@@ -58,5 +64,19 @@ public class AuthService {
 
         emailService.sendEmail(body.getEmail(), "Recuperação de senha", text);
 
+    }
+
+    @Transactional
+    public void saveNewPassword(NewPasswordDTO body) {
+
+        List<PasswordRecover> result = passwordRecoverRepository.searchValidTokens(body.getToken(), Instant.now());
+
+        if (result.size() == 0) {
+            throw new ResourceNotFoundException("Token inválido");
+        }
+        User user = userRepository.findByEmail(result.get(0).getEmail());
+        user.setPassword(passwordEncoder.encode(body.getPassword()));
+
+        user = userRepository.save(user);
     }
 }
