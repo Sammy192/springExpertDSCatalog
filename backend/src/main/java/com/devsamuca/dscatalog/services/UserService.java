@@ -39,6 +39,9 @@ public class UserService implements UserDetailsService {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private AuthService authService;
+
     @Transactional(readOnly = true)
     public Page<UserDTO> findAll(Pageable pageable) {
         Page<User> list = repository.findAll(pageable);
@@ -129,5 +132,12 @@ public class UserService implements UserDetailsService {
         }
 
         return user;
+    }
+
+    //retorna user logado
+    @Transactional(readOnly = true)
+    public UserDTO findMe() {
+        User entity = authService.authenticated();
+        return new UserDTO(entity);
     }
 }
