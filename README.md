@@ -14,12 +14,19 @@ Esse repositório contém o projeto final desenvolvido para conclusão do treina
 
 Este projeto visa criar uma API RESTful de um sistema de catágolo de produtos usando tecnologias como
 ● Java 
+
 ● Spring Boot Framework
+
 ● Spring Security
+
 ● Bean Validation
+
 ● PostgresSQL como banco de dados
+
 ● JWT para controle de autenticação
+
 ● JUnit e Mockito para testes unitários e integrados
+
 ● JaCoCo para cobertura de testes.
 
 # Visão geral do sistema
