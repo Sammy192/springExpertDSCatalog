@@ -1,5 +1,7 @@
 package com.devsamuca.dscatalog.resources.exceptions;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
 import com.devsamuca.dscatalog.services.exceptions.DatabaseException;
 import com.devsamuca.dscatalog.services.exceptions.EmailException;
 import com.devsamuca.dscatalog.services.exceptions.ResourceNotFoundException;
@@ -70,5 +72,45 @@ public class ResourceExceptionHandler {
 
         return ResponseEntity.status(status).body(err);
     }
+
+    @ExceptionHandler(AmazonServiceException.class)
+    public ResponseEntity<StandardError> amazonService(AmazonServiceException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError();
+        err.setTimestamp(Instant.now());
+        err.setStatus(status.value());
+        err.setError("AWS Exception");
+        err.setMessage(e.getMessage());
+        err.setPath(request.getRequestURI());
+
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(AmazonClientException.class)
+    public ResponseEntity<StandardError> amazonClient(AmazonClientException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError();
+        err.setTimestamp(Instant.now());
+        err.setStatus(status.value());
+        err.setError("AWS Exception");
+        err.setMessage(e.getMessage());
+        err.setPath(request.getRequestURI());
+
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<StandardError> illegalArgument(IllegalArgumentException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError();
+        err.setTimestamp(Instant.now());
+        err.setStatus(status.value());
+        err.setError("Bad request");
+        err.setMessage(e.getMessage());
+        err.setPath(request.getRequestURI());
+
+        return ResponseEntity.status(status).body(err);
+    }
+
 
 }

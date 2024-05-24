@@ -1,6 +1,7 @@
 package com.devsamuca.dscatalog.resources;
 
 import com.devsamuca.dscatalog.dto.ProductDTO;
+import com.devsamuca.dscatalog.dto.UriDTO;
 import com.devsamuca.dscatalog.projections.ProductProjection;
 import com.devsamuca.dscatalog.services.ProductService;
 import jakarta.validation.Valid;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -57,6 +59,13 @@ public class ProductResource {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_OPERATOR')")
+    @PostMapping(value = "/image")
+    public ResponseEntity<UriDTO> uploadImage(@RequestParam("file")MultipartFile file) {
+        UriDTO dto = service.uploadFile(file);
+        return ResponseEntity.ok().body(dto);
     }
         
 }
